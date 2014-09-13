@@ -22,7 +22,7 @@ where load is between 0 and 1.
 
 I use a shell alias to simplify issuing the command
 ```bash
-alias cnloads fab -f ~/code/fabfiles/cn_loads_fabfile.py cn_loads
+alias cnloads 'fab -f ~/code/fabfiles/cn_loads_fabfile.py cn_loads'
 ```
 
 ```
