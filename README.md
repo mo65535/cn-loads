@@ -17,12 +17,6 @@ The metric used to determine available power is
 
 where load is between 0 and 1.
 
-## Using it
-
-To adapt this script to a setup with different machines, you 
-will need to modify the line that generates the list of hosts.
-You will probaly also want to set up SSH keys (see below).
-
 
 #### Example run:
 
@@ -68,12 +62,12 @@ This script uses the Fabric framework which is designed to simplify
 remote administration of machines by automating the process of SSHing
 into those machines and running commands on them.
 
-You'll need to install Fabric. If you have pip, that should be as
-simple as
-
+You'll need to install Fabric and PyYAML. If you have pip, that 
+should be as simple as
 
 ```bash
 pip install Fabric
+pip install PyYAML
 ```
 
 That should create a `fab` executable in the `bin/` directory of your
@@ -85,6 +79,9 @@ Then you can use an alias similar to the one above if you want a nice
 shortcut for running the script.
 
 ### Note:
+
+To adapt this script to a setup with different machines, you 
+will need to modify the line that generates the list of hosts.
 
 To save yourself from typing in your password a bunch of times when
 the program runs, you'll also want to set up SSH keys. I think I 
