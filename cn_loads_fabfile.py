@@ -36,8 +36,11 @@ def cn_loads():
     avg_loads, cpu_counts, cpu_clocks = {}, {}, {}
     with fabric.context_managers.hide("running"):
         avg_loads  = execute(get_avg_load,  hosts=cn_machines)
-        cpu_counts = execute(get_cpu_count, hosts=cn_machines)
-        cpu_clocks = execute(get_cpu_clock, hosts=cn_machines)
+        #cpu_counts = execute(get_cpu_count, hosts=cn_machines)
+        #cpu_clocks = execute(get_cpu_clock, hosts=cn_machines)
+
+    # Read local DB instead of querying remote machines, when possible
+    cpu_counts, cpu_clocks = get_cpu_counts_and_clocks(hosts=cn_machines)
 
     # Calculate available computing power of each machine:
     # (1.0-(avg_load/100.0)) * num_processors * clockrate
@@ -88,6 +91,101 @@ def test_connectivity(verbose=False):
         print("{Host:4} | connectable?: {Connectable}".format(Host=env.host, Connectable=connectable))
 
     return connectable
+
+
+
+def read_db():
+    """Reads database with historic values for cpu count and clock
+
+    If file exists, opens it and reads it, parsing as YAML
+    If file does not exist or is empty, returns an empty dict
+    """
+
+    # Look for database in the same folder as this script
+    script_dir = os.path.dirname(os.path.realpath(__file__))
+    db_filepath = os.path.join(script_dir, 'cn_loads_database.dat')
+
+    db = None
+    if os.path.isfile(db_filepath):
+        with open(db_filepath, 'r') as f:
+            db = yaml.load(f.read())
+            if db == None:
+                db = dict()
+    else:
+        db = dict()
+
+    return db
+
+
+
+def write_db(db):
+    """Writes database with historic values for cpu count and clock
+
+    If file exists, it will be overwritten
+    """
+
+    # Look for database in the same folder as this script
+    script_dir = os.path.dirname(os.path.realpath(__file__))
+    db_filepath = os.path.join(script_dir, 'cn_loads_database.dat')
+
+    with open(db_filepath, 'w') as f:
+        f.write(yaml.dump(db, default_flow_style=False))
+
+
+
+def get_cpu_counts_and_clocks(hosts, verbose=False):
+    """Determines CPU counts and clocks
+
+    Reads YAML database for historic values
+    Builds a list of hosts that need to be queried
+      either because they're not in DB, or their value in DB is too old
+    Executes get_cpu_count and get_cpu_clock in parallel on those hosts
+    Writes new values and update times, if any, to database
+    Returns dicts mapping host -> cpu_count and host -> cpu_clock
+      like execute(get_cpu_count, hosts) & execute(get_cpu_clock, hosts)
+    """
+
+    db = read_db()
+
+    now = datetime.now()
+    one_week_delta = timedelta(weeks=1)
+
+    # Determine which hosts need to be updated
+    to_update = []
+    for host in hosts:
+        if host not in db:
+            to_update.append(host)
+        else:
+            last_update = datetime.strptime(db[host]['update_time'], "%Y-%m-%d %H:%M:%S")
+
+            if (now - last_update) > one_week_delta:
+                to_update.append(host)
+
+    if verbose:
+        print 'Updating hosts:'
+        for host in to_update:
+            print ' ' + host
+
+    cpu_counts, cpu_clocks = {}, {}
+    if to_update:
+        with fabric.context_managers.hide("running"):
+            cpu_counts = execute(get_cpu_count, hosts=to_update)
+            cpu_clocks = execute(get_cpu_clock, hosts=to_update)
+
+    # Add updated information to db
+    for host in to_update:
+        if host not in db:
+            db[host] = {}
+
+        db[host]['cpu_count']   = cpu_counts[host]
+        db[host]['cpu_clock']   = cpu_clocks[host]
+        db[host]['update_time'] = now.strftime("%Y-%m-%d %H:%M:%S")
+    write_db(db)
+
+    counts = {host : db[host]['cpu_count'] for host in hosts}
+    clocks = {host : db[host]['cpu_clock'] for host in hosts}
+
+    return counts, clocks
 
 
 
