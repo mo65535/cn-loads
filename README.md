@@ -86,7 +86,7 @@ shortcut for running the script.
 
 ### Note:
 
-To save yourself from typing in your password a bunch of times, when
+To save yourself from typing in your password a bunch of times when
 the program runs, you'll also want to set up SSH keys. I think I 
 referred to this guide when setting that up for myself: 
 http://paulkeck.com/ssh/
