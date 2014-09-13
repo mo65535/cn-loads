@@ -60,7 +60,8 @@ Done.
 
 This script uses the Fabric framework which is designed to simplify 
 remote administration of machines by automating the process of SSHing
-into those machines and running commands on them.
+into those machines and running commands on them. 
+http://www.fabfile.org/
 
 You'll need to install Fabric and PyYAML. If you have pip, that 
 should be as simple as
