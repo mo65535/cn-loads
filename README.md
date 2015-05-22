@@ -6,16 +6,10 @@ Python Fabric script to check the current load of remote machines
 
 ## What is it?
 
-This script gives you some idea of the available computing power
-on remote machines. It can be handy if you're in a group where
-servers that act as computation nodes for large, long-running
-jobs are shared between several people.
+This script gives you some idea of the available computing power on remote machines.
+It can be handy if you're in a group where servers that act as computation nodes for large, long-running jobs are shared between several people.
 
-The metric used to determine available power is
-
-(1 - load) * number of cores * clock speed
-
-where load is between 0 and 1.
+The metric used to determine available power is `(1 - load) * number of cores * clock speed`, where load is between 0 and 1.
 
 
 #### Example run:
@@ -58,39 +52,29 @@ Done.
 
 ## How does it work?
 
-This script uses the Fabric framework which is designed to simplify 
-remote administration of machines by automating the process of SSHing
-into those machines and running commands on them. 
+This script uses the Fabric framework which is designed to simplify remote administration of machines by automating the process of SSHing into those machines and running commands on them. 
 http://www.fabfile.org/
 
-You'll need to install Fabric and PyYAML. If you have pip, that 
-should be as simple as
+You'll need to install Fabric and PyYAML.
+If you have pip, that should be as simple as
 
 ```bash
 pip install Fabric
 pip install PyYAML
 ```
 
-That should create a `fab` executable in the `bin/` directory of your
-Python install. If that directory is on your path, you're set -- If
-not, you'll probably want to make a symlink in a folder that is on
-your path (somewhere like `~/bin`) that points to the fab executable.
+That should create a `fab` executable in the `bin/` directory of your Python install.
+If that directory is on your path, you're set -- If not, you'll probably want to make a symlink in a folder that is on your path (somewhere like `~/bin`) that points to the fab executable.
 
-Then you can use an alias similar to the one above if you want a nice
-shortcut for running the script.
+Then you can use an alias similar to the one above if you want a shortcut for running the script.
 
 ### Note:
 
-To adapt this script to a setup with different machines, you 
-will need to modify the line that generates the list of hosts.
+To adapt this script to a setup with different machines, you will need to modify the line that generates the list of hosts.
 
-To save yourself from typing in your password a bunch of times when
-the program runs, you'll also want to set up SSH keys. I think I 
-referred to this guide when setting that up for myself: 
+To save yourself from typing in your password a bunch of times when the program runs, you'll also want to set up SSH keys.
+I think I referred to this guide when setting that up for myself: 
 http://paulkeck.com/ssh/
 
-Apparently SSH keys can be set up for the case where you use different
-usernames and passwords on different machines. In my situation, all
-machines are using a shared network drive, and things like username 
-and password configuration files are stored there and shared across
-the machines. 
+Apparently SSH keys can be set up for the case where you use different usernames and passwords on different machines.
+In my situation, all machines are using a shared network drive, and things like username  and password configuration files are stored there and shared across the machines. 
